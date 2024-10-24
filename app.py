@@ -50,7 +50,7 @@ st.set_page_config(
                  layout="wide",
                  page_icon=":material/playing_cards:",
                  menu_items={
-        'Get Help': 'mailto:w_saturnin@gmail.com',
+        'Get Help': 'mailto:w.maillot@gmail.com',
         'Report a bug': "https://github.com/WillyMaillot87/PotoAltered/issues",
         'About': "# PotoAltered. \n Une app très cool faite par Willy Maillot"}
         )
