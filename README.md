@@ -2,31 +2,29 @@
 This project is a work in progress. Contributions and feedback are welcome.
 
 ## Features
-This app offers a comprehensive solution for tracking your **Altered** collection. Key features include:
+This app offers a comprehensive solution for tracking your **Altered** collection. Key features include :
 
-- Card Inventory: View a detailed list of all your cards, including their names, sets, and quantities.
-- Card Aggregation: Automatically consolidate cards by name, regardless of their edition or condition.
-- Missing Cards: Identify which cards you need to complete your collection.
-- Excess Cards: Determine cards you have in excess and consider trading or selling.
+- Detailed inventory of your collection
+- Automated card consolidation by name
+- Identification of missing and excess cards
+- Easy comparison of your collection with a friend's
 
 ## How to use
+There are two ways to use this application:
 
-Choose one of the two options :
+1. Web App
 
-1. **From the website**
+For a quick and easy experience, access the web app directly through this link:
 
-URL : 
 [https://potoaltered.streamlit.app/](https://potoaltered.streamlit.app/)
 
-2. **Run the docker**
+2. Desktop App (Windows Only)
 
-Pull the docker image : 
-`docker pull willymaillot87/potoaltered:v1.0`
+For offline use, download the desktop app:
 
-Run the docker app: 
-`docker run -p 8501:8501 willymaillot87/potoaltered:v1.0`
-
-Connect to http://localhost:8501/ on your browser.
+- Download the application ([download file](https://drive.google.com/file/d/1MjLbFqGxaY6evaLynDa4m7c5FCIYjzcn/view?usp=sharing)).
+- Unzip the downloaded file to a directory of your choice.
+- Double-click on the potoaltered.exe file to launch the application.
 
 
 
