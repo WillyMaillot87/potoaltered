@@ -172,7 +172,7 @@ card_images
 card_assets
 .exploration.ipynb
 PotoAltered.code-workspace
-test.py
 token.txt
-commands.txt
+commands.md
 .streamlit
+potoaltered.exe-win32-x64/
