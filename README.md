@@ -16,7 +16,7 @@ Choose one of the two options :
 1. **From the website**
 
 URL : 
-[https://potoaltered-3.streamlit.app/](https://potoaltered-3.streamlit.app/)
+[https://potoaltered.streamlit.app/](https://potoaltered.streamlit.app/)
 
 2. **Run the docker**
 
