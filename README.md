@@ -22,7 +22,7 @@ For a quick and easy experience, access the web app directly through this link:
 
 For offline use, download the desktop app:
 
-- Download the application ([download file](https://drive.google.com/file/d/1MjLbFqGxaY6evaLynDa4m7c5FCIYjzcn/view?usp=sharing)).
+- Download the application ([download file](https://drive.google.com/file/d/1paxAKXtSTYJ6LDT5Yj--56ETSuSTYhYd/view?usp=sharing)).
 - Unzip the downloaded file to a directory of your choice.
 - Double-click on the potoaltered.exe file to launch the application.
 
