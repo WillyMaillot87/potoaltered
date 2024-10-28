@@ -245,7 +245,26 @@ Ne communiques ton token à personne !
                 run_script(saved_token)
 
         with col2 :
-            st.image("images/PotoAltered.png", width=800)
+            st.image("images/PotoAltered_logo.png", width=500)
+
+        st.subheader("Comment récupérer son token ?", divider = 'red')
+        left1, right1 = st.columns([1,2])
+        left1.markdown('''
+
+Pour accéder à ta collection de cartes, tu dois obtenir ton propre token JWT sur le site altered.gg. Voici comment procéder :
+
+- Connecte-toi sur [**altered.gg**](https://www.altered.gg/) avec ton compte.
+- Appuie sur :red[**F12**] pour accéder aux outils de développement de ton navigateur
+- Va dans la section **"Réseau"**
+- Sur la page web, clique sur **"Cartes"** puis sur **"Collection"**
+- Dans les outils de développement, cherche la ligne affichant la requête ***api.altered.gg/me***
+- Copie le jeton Bearer dans l'en-tête **"Authorization"**
+- Colle-le dans le champ ci-dessus :arrow_up:
+- C'est tout ! :heavy_check_mark:
+
+        ''')
+
+        right1.image("images/tuto_token.png")
 
 
 ### COLLECTION PAGE ###
