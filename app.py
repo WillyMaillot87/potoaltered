@@ -199,7 +199,7 @@ def run():
 ### HOME PAGE ###
     if selected == "Home" : 
         
-        col1, col2 = st.columns(2)
+        col1, col2 = st.columns([2,1])
 
         with col1 : 
             st.title("Bienvenue !")
@@ -254,10 +254,10 @@ Ne communiques ton token à personne !
 Pour accéder à ta collection de cartes, tu dois obtenir ton propre token JWT sur le site altered.gg. Voici comment procéder :
 
 - Connecte-toi sur [**altered.gg**](https://www.altered.gg/) avec ton compte.
-- Appuie sur :red[**F12**] pour accéder aux outils de développement de ton navigateur
-- Va dans la section **"Réseau"**
 - Sur la page web, clique sur **"Cartes"** puis sur **"Collection"**
-- Dans les outils de développement, cherche la ligne affichant la requête ***api.altered.gg/me***
+- Appuie sur :red[**F12**] pour accéder aux outils de développement de ton navigateur
+- Dans les outils de développement, va dans la section **"Réseau"**
+- Cherche la ligne affichant la requête ***api.altered.gg/me***
 - Copie le jeton Bearer dans l'en-tête **"Authorization"**
 - Colle-le dans le champ ci-dessus :arrow_up:
 - C'est tout ! :heavy_check_mark:
