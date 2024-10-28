@@ -1,31 +1,73 @@
 # PotoAltered
 This project is a work in progress. Contributions and feedback are welcome.
 
-## Features
-This app offers a comprehensive solution for tracking your **Altered** collection. Key features include:
+## **Features**
+This app offers a comprehensive solution for tracking your **Altered** collection. Key features include :
 
-- Card Inventory: View a detailed list of all your cards, including their names, sets, and quantities.
-- Card Aggregation: Automatically consolidate cards by name, regardless of their edition or condition.
-- Missing Cards: Identify which cards you need to complete your collection.
-- Excess Cards: Determine cards you have in excess and consider trading or selling.
+- Detailed inventory of your collection
+- Automated card consolidation by name
+- Identification of missing and excess cards
+- Easy comparison of your collection with a friend's
 
-## How to use
+## **How to use**
+There are two ways to use this application:
 
-**Pull the docker image**
+### 1. Web App
 
-`docker pull willymaillot87/potoaltered:v1.0`
+For a quick and easy experience, access the web app directly through this link:
+
+[https://potoaltered.streamlit.app/](https://potoaltered.streamlit.app/)
+
+### 2. Desktop App (Windows Only)
+
+For offline use, download the desktop app:
+
+- Download the application ([download file](https://drive.google.com/file/d/1paxAKXtSTYJ6LDT5Yj--56ETSuSTYhYd/view?usp=sharing)).
+- Unzip the downloaded file to a directory of your choice.
+- Double-click on the potoaltered.exe file to launch the application.
+
+### 3. Pull from github repo:
+
+**Prerequisites:**
+   - Ensure you have Git installed on your system. You can download it from https://git-scm.com/downloads.
+   - Python 3.11 is also required. You can check your version by running `python --version` in your terminal. If you need Python, download it from https://www.python.org/downloads/.
+
+**Clone the Repository:**
+   - Open a terminal window and navigate to your desired working directory.
+   - Run the following command to clone the repository:
+
+     `git clone https://github.com/WillyMaillot87/PotoAltered`
+
+   - This will create a new directory named *PotoAltered* in your current working directory.
+
+**Install Dependencies:**
+   - Navigate to the cloned directory:
+
+     `cd PotoAltered`
+
+   - Install the required dependencies listed in *requirements.txt* :
+
+     `pip install -r requirements.txt`
+
+     This command will download and install all the necessary libraries needed for your application to run.
+
+**Run the Application:**
+   - Start the Streamlit app using the following command:
+
+     `streamlit run app.py`
+
+   - This will launch your application in a web browser at `http://localhost:8501`. You can now interact with the app's features and functionalities.
+
+## **Get your token**
+
+In order to access your cards collection, you'll need to get your own token from altered.gg website. Here is how to proceed : 
+- Connect to altered.gg with your account
+- Press F12 to access to the browser developer tool
+- go to the "network" section
+- on the webpage click on "cards", then on "collection"
+- in the browser developer tool look for the line showing the *api.altered.gg/me* request
+- copy the Bearer token in the header "Authorization"
+- Paste it in your PotoAltered app
+- That's it !
 
 
-**Run the docker app**
-
-`docker run -p 8501:8501 willymaillot87/potoaltered:v1.0`
-
-
-**Use the app** 
-
-* Connect to http://localhost:8501/ on your browser.
-<<<<<<< HEAD
-* **First time users:** You'll need to obtain a token to download your collection.
-=======
-* **First time users:** You'll need to obtain a token to download your c
->>>>>>> 96f43efb48098364b8da45e90825e2fee41ceecf
