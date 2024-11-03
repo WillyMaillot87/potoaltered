@@ -224,25 +224,7 @@ Ne communiques ton token à personne !
 
             if submit:
                 st.session_state["input_token"] = input_token
-                # st.write("Téléchargement en cours... BLA BLA BLA ... BIP BIP BOOP BIP...01001110100111010101010")
-                # # Écrire le token dans le fichier .env
-                # with open('.env', 'w') as f:
-                #     f.write(f"TOKEN='{input_token}'")
-                with open("token.txt", "w") as f:
-                    f.write(input_token)
-                st.write("Token sauvegardé")
-
-                with open("token.txt", "r") as f:
-                    saved_token = f.read()
-            # # Bouton pour enregistrer le token dans le fichier .env et pour lancer les scripts
-            # if submit:
-            #     # Écrire le token dans le fichier .env
-            #     with open('token.txt', 'w') as f:
-            #         f.write(f"TOKEN={input_token}")
-            #     st.write("Token sauvegardé !")
-
-                # Executer les scripts
-                run_script(saved_token)
+                run_script(st.session_state["input_token"])
 
         with col2 :
             st.image("images/PotoAltered_logo.png", width=500)
