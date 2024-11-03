@@ -64,7 +64,7 @@ In order to access your cards collection, you'll need to get your own token from
 - Connect to altered.gg with your account
 - Press F12 to access to the browser developer tool
 - go to the "network" section
-- on the webpage click on "cards", then on "collection"
+- Press F5 to refresh the page
 - in the browser developer tool look for the line showing the *api.altered.gg/me* request
 - copy the Bearer token in the header "Authorization"
 - Paste it in your PotoAltered app

@@ -253,8 +253,8 @@ Ne communiques ton token à personne !
         Pour accéder à ta collection de cartes, tu dois obtenir ton propre token JWT sur le site altered.gg. Voici comment procéder :
 
         - Connecte-toi sur [**altered.gg**](https://www.altered.gg/) avec ton compte.
-        - Sur la page web, clique sur **"Cartes"** puis sur **"Collection"**
         - Appuie sur :red[**F12**] pour accéder aux outils de développement de ton navigateur
+        - Appuie sur :red[**F5**] pour rafraichir la page
         - Dans les outils de développement, va dans la section **"Réseau"**
         - Cherche la ligne affichant la requête ***api.altered.gg/me***
         - Copie le jeton Bearer dans l'en-tête **"Authorization"**
