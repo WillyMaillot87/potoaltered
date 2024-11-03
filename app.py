@@ -12,6 +12,9 @@ from get_all_data import get_dataframes
 from utils import dump_json, create_folder_if_not_exists, create_or_read_file
 from os.path import join
 
+# Version : 
+version = "v1.5"
+
 # Parameters
 LANGUAGES = ["fr"]
 DUMP_TEMP_FILES = False
@@ -203,7 +206,7 @@ def run():
 
         with col1 : 
             st.title("Bienvenue !") 
-            st.text("(v1.5)")
+            st.text(f"({version})")
             st.markdown("""Dans le but de pouvoir récupérer les données de ta collection personnelle, je t'invite à coller ton token JWT dans le champ ci-dessous. 
 Ce token est directement envoyé à l'API d'Altered pour t'identifier et accéder à ta collection.
 Le token n'est pas envoyé en ligne, il reste stocké uniquement sur ton application à toi.
