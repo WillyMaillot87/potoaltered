@@ -9,7 +9,7 @@ from get_cards_data import get_cards_data
 from get_csv_data import get_csv
 from get_csv_collection import get_csv_collec
 from get_all_data import get_dataframes
-from utils import dump_json, create_folder_if_not_exists, create_or_read_file
+from utils import dump_json, create_folder_if_not_exists
 from os.path import join
 
 # Version : 
@@ -46,7 +46,8 @@ ALL_CARDS_PATH = "data/cards_fr.csv"
 MY_COLLECTION_PATH = "data/collection_fr.csv"
 CSV_ALL_OUTPUT_PATH = "data/global_vision.csv"
 
-saved_token = create_or_read_file("token.txt")
+# Supprimer la lecture du token depuis un fichier
+# saved_token = create_or_read_file("token.txt")
 
 st.set_page_config(
     page_title= "PotoAltered",
@@ -68,9 +69,14 @@ button[title="View fullscreen"]{
 
 st.markdown(hide_img_fs, unsafe_allow_html=True)
 
-def run_script(saved_token):
-    try :
-        #get_cards_data :
+def run_script():
+    saved_token = st.session_state.get("input_token")
+    if not saved_token:
+        st.error("Le token n'est pas défini. Merci de le saisir sur la page 'Home'.")
+        return
+
+    try:
+        # get_cards_data :
         cards, types, subtypes, factions, rarities = get_cards_data()
         create_folder_if_not_exists(OUTPUT_FOLDER)
         dump_json(cards,    join(OUTPUT_FOLDER, 'cards.json'))
@@ -195,7 +201,6 @@ def run():
         menu_title=None,
         options=["Home", "Collection", "Tradable"],
         icons=["house", "collection", "arrow-left-right"],
-        # menu_icon=None,
         orientation="horizontal"
     )
 
@@ -228,7 +233,7 @@ Ne communiques ton token à personne !
 
             if submit:
                 st.session_state["input_token"] = input_token
-                run_script(st.session_state["input_token"])
+                run_script()
 
         with col2 :
             st.image("images/PotoAltered_logo.png", width=500)
