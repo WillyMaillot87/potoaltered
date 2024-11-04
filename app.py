@@ -1,19 +1,16 @@
 import streamlit as st
 import pandas as pd
-import os
+from os.path import join
 import subprocess
-import plotly.express as px
-
 from streamlit_option_menu import option_menu
 from get_cards_data import get_cards_data
 from get_csv_data import get_csv
 from get_csv_collection import get_csv_collec
 from get_all_data import get_dataframes
-from utils import dump_json, create_folder_if_not_exists, create_or_read_file
-from os.path import join
+from utils import dump_json, create_folder_if_not_exists
 
 # Version : 
-version = "v1.5"
+version = "v2"
 
 # Parameters
 LANGUAGES = ["fr"]
@@ -46,7 +43,13 @@ ALL_CARDS_PATH = "data/cards_fr.csv"
 MY_COLLECTION_PATH = "data/collection_fr.csv"
 CSV_ALL_OUTPUT_PATH = "data/global_vision.csv"
 
-saved_token = create_or_read_file("token.txt")
+# PAGES #
+page_home = st.Page("page_home.py", title="Accueil", icon=":material/home:")
+page_collection = st.Page("page_collection.py", title="Collection", icon=":material/style:")
+page_echanges = st.Page("page_echanges.py", title="Echanges", icon=":material/sync_alt:")
+
+pg = st.navigation([page_home, page_collection, page_echanges])
+pg.run()
 
 st.set_page_config(
     page_title= "PotoAltered",
@@ -57,6 +60,7 @@ st.set_page_config(
         'Report a bug': "https://github.com/WillyMaillot87/PotoAltered/issues",
         'About': "# PotoAltered. \n Une app très cool faite par Willy Maillot"}
         )
+
 
 #Cacher le bouton 'view fullscreen' des images :
 hide_img_fs = '''
@@ -337,12 +341,15 @@ Ne communiques ton token à personne !
 
             excess = st.button("Afficher les cartes en trop", use_container_width=True)
             missing = st.button("Afficher les cartes manquantes", use_container_width=True)
+            possessed = st.button("Afficher les cartes possédées", use_container_width=True)
             st.button("Reset", use_container_width=True)
 
             if excess :
                 df = df[df['En excès'] > 0]
-            if missing :
+            elif missing :
                 df = df[df['Manquantes'] > 0]
+            elif possessed :
+                df = df[df['En possession'] > 0]
             else :
                 df = df
 
@@ -363,6 +370,11 @@ Ne communiques ton token à personne !
                 type="primary",
                 use_container_width=True
                 )
+            
+            #### STATISTIQUES #####
+            shape_all = df_all.shape[0]
+            shape_filtered = df.shape[0]
+            st.markdown(f"**{shape_filtered}** cartes sélectionnées sur **{shape_all}** disponibles")
 
         with df_col :
             st.subheader("Collection")
@@ -381,48 +393,6 @@ Ne communiques ton token à personne !
 
         # st.header(f"Cartes sélectionnées : {len(cards)}")
         # st.dataframe(second_df, column_config=column_configuration, use_container_width=True)
-    
-#### STATISTIQUES #####
-        st.subheader("Statistiques", divider = 'gray')
-        stats, graph = st.columns([1, 2], vertical_alignment="center")
-        
-        shape_all = df_all.shape[0]
-        shape_collec = df[df['En possession'] > 0].shape[0]
-
-        with stats :
-            st.markdown(f"**{shape_all}** cartes à collectionner")
-            st.markdown(f"**{shape_collec}** cartes dans la collection")
-            st.markdown(f"Collection complétée à **{(shape_collec / shape_all) * 100:.2f}** %")
-
-        # Barplot :
-        df_barplot = df[['Type','Rareté','En possession', 'En excès', 'Manquantes']].copy()
-        df_barplot['Max Deck'] = (df['En possession'] + df['Manquantes']) - df['En excès']
-
-        df_barplot['Progression'] = (df_barplot['En possession'] - df_barplot['En excès']) / df_barplot['Max Deck']
-        df_barplot = df_barplot.groupby(['Rareté', 'Type'])['Progression'].mean().reset_index()
-        df_barplot = df_barplot.query("Type in ['Héros', 'Personnage', 'Sort', 'Permanent']")
-
-        fig = px.bar(df_barplot, 
-                    x='Progression', 
-                    y='Rareté', 
-                    color='Type', 
-                    barmode='group',
-                    text=df_barplot['Progression'].apply(lambda x: f"{x:.2%}")          
-                    )
-
-        fig.update_layout(barcornerradius=15,
-                        #   showlegend=False,
-                            xaxis_title=None,
-                            yaxis_title=None,
-                            height=350,
-                            legend=dict(
-                            y=0.5, x=-0.2  # Ajustez la valeur pour positionner la légende plus haut ou plus bas
-                        ))
-
-
-        with graph :
-            st.plotly_chart(fig, use_container_width=True, theme="streamlit")
-
 
 ### TRADABLE PAGE ###     
     if selected == "Tradable" : 
