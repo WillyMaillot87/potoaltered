@@ -34,32 +34,30 @@ MAIN_LANGUAGE = "fr"
 GROUP_SUBTYPES = False
 INCLUDE_WEB_ASSETS = False
 
-CARDS_DATA_PATH = "data/cards.json"
-COLLECTION_DATA_PATH = "data/collection.json"
-FACTIONS_DATA_PATH = "data/factions.json"
-TYPES_DATA_PATH = "data/types.json"
-SUBTYPES_DATA_PATH = "data/subtypes.json"
-RARITIES_DATA_PATH = "data/rarities.json"
-CSV_OUTPUT_PATH = "data/cards_" + MAIN_LANGUAGE + ".csv"
-CSV_COLLEC_OUTPUT_PATH = "data/collection_" + MAIN_LANGUAGE + ".csv"
-ALL_CARDS_PATH = "data/cards_fr.csv"
-MY_COLLECTION_PATH = "data/collection_fr.csv"
-CSV_ALL_OUTPUT_PATH = "data/global_vision.csv"
-
-# Supprimer la lecture du token depuis un fichier
-# saved_token = create_or_read_file("token.txt")
+# Remove paths since we won't use them
+# CARDS_DATA_PATH = "data/cards.json"
+# COLLECTION_DATA_PATH = "data/collection.json"
+# FACTIONS_DATA_PATH = "data/factions.json"
+# TYPES_DATA_PATH = "data/types.json"
+# SUBTYPES_DATA_PATH = "data/subtypes.json"
+# RARITIES_DATA_PATH = "data/rarities.json"
+# CSV_OUTPUT_PATH = "data/cards_" + MAIN_LANGUAGE + ".csv"
+# CSV_COLLEC_OUTPUT_PATH = "data/collection_" + MAIN_LANGUAGE + ".csv"
+# ALL_CARDS_PATH = "data/cards_fr.csv"
+# MY_COLLECTION_PATH = "data/collection_fr.csv"
+# CSV_ALL_OUTPUT_PATH = "data/global_vision.csv"
 
 st.set_page_config(
     page_title= "PotoAltered",
-                 layout="wide",
-                 page_icon=":material/playing_cards:",
-                 menu_items={
-        'Get Help': 'mailto:w.maillot@gmail.com',
-        'Report a bug': "https://github.com/WillyMaillot87/PotoAltered/issues",
-        'About': "# PotoAltered. \n Une app très cool faite par Willy Maillot"}
-        )
+                     layout="wide",
+                     page_icon=":material/playing_cards:",
+                     menu_items={
+            'Get Help': 'mailto:w.maillot@gmail.com',
+            'Report a bug': "https://github.com/WillyMaillot87/PotoAltered/issues",
+            'About': "# PotoAltered. \n Une app très cool faite par Willy Maillot"}
+            )
 
-#Cacher le bouton 'view fullscreen' des images :
+# Hide the 'view fullscreen' button of images
 hide_img_fs = '''
 <style>
 button[title="View fullscreen"]{
@@ -78,42 +76,45 @@ def run_script():
     try:
         # get_cards_data :
         cards, types, subtypes, factions, rarities = get_cards_data()
-        create_folder_if_not_exists(OUTPUT_FOLDER)
-        dump_json(cards,    join(OUTPUT_FOLDER, 'cards.json'))
-        dump_json(types,    join(OUTPUT_FOLDER, 'types.json'))
-        dump_json(subtypes, join(OUTPUT_FOLDER, 'subtypes.json'))
-        dump_json(factions, join(OUTPUT_FOLDER, 'factions.json'))
-        dump_json(rarities, join(OUTPUT_FOLDER, 'rarities.json'))
+        # Store data in session_state instead of files
+        st.session_state['cards'] = cards
+        st.session_state['types'] = types
+        st.session_state['subtypes'] = subtypes
+        st.session_state['factions'] = factions
+        st.session_state['rarities'] = rarities
 
-        #get_collection_data :
-        collection, types, subtypes, factions, rarities = get_cards_data(collection_token=saved_token)
-        create_folder_if_not_exists(OUTPUT_FOLDER)
-        dump_json(collection,    join(OUTPUT_FOLDER, 'collection.json'))
+        # get_collection_data :
+        collection, _, _, _, _ = get_cards_data(collection_token=saved_token)
+        st.session_state['collection'] = collection
 
-        #get_csv_data :
-        get_csv()
+        # get_csv_data :
+        cards_csv = get_csv(cards, types, subtypes, factions, rarities)
+        st.session_state['cards_csv'] = cards_csv
 
-        #get_csv_collection :
-        get_csv_collec()
+        # get_csv_collection :
+        collection_csv = get_csv_collec(collection)
+        st.session_state['collection_csv'] = collection_csv
 
-        #get_all_data
-        get_dataframes(ALL_CARDS_PATH, MY_COLLECTION_PATH)
+        # get_all_data
+        global_df = get_dataframes(st.session_state['cards_csv'], st.session_state['collection_csv'])
+        st.session_state['global_df'] = global_df
 
         st.success("Le chargement de la collection est terminé.")
     except subprocess.CalledProcessError as e:
         st.error(f"Erreur lors de l'execution du script : {e}")
 
-def create_dataframe(csv_path):
-    if os.path.isfile(csv_path) :
-        df = pd.read_csv(csv_path)
-    else :
+def create_dataframe():
+    if 'global_df' in st.session_state:
+        df = st.session_state['global_df']
+        return df
+    else:
         st.error("La collection n'est pas créée. Merci d'ajouter votre token via la page 'Home'.")
-    return df
+        return pd.DataFrame()  # Return an empty DataFrame if not available
 
-def transform_dataframe(df) :   
+def transform_dataframe(df):   
     columns_power = ['forestPower', 'mountainPower', 'waterPower']
 
-    if all(column in df.columns for column in columns_power) :
+    if all(column in df.columns for column in columns_power):
         df['Forest-Mountain-Water'] = df[['forestPower', 'mountainPower', 'waterPower']].apply(lambda x: list(x), axis=1)
 
     new_names_fr = {'name_fr' : 'Nom',
@@ -170,7 +171,7 @@ def transform_dataframe(df) :
         ),
         'Image': st.column_config.ImageColumn(
             "Image", 
-            help="Aperçut de la carte. Double cliquer pour agrandir.",
+            help="Aperçu de la carte. Double-cliquer pour agrandir.",
             width = "small"
             ),
         }
@@ -217,7 +218,7 @@ Ce token est directement envoyé à l'API d'Altered pour t'identifier et accéde
 Le token n'est pas envoyé en ligne, il reste stocké uniquement sur ton application à toi.
 Cette étape n'est à faire qu'une seule fois pour télécharger les données de ta collection.
                     
-Ne communiques ton token à personne !
+Ne communique ton token à personne !
                     """)
 
             mini_col1, mini_col2 = st.columns(2, vertical_alignment="bottom")
@@ -245,7 +246,7 @@ Ne communiques ton token à personne !
 
         - Connecte-toi sur [**altered.gg**](https://www.altered.gg/) avec ton compte.
         - Appuie sur :red[**F12**] pour accéder aux outils de développement de ton navigateur
-        - Appuie sur :red[**F5**] pour rafraichir la page
+        - Appuie sur :red[**F5**] pour rafraîchir la page
         - Dans les outils de développement, va dans la section **"Réseau"**
         - Cherche la ligne affichant la requête ***api.altered.gg/me***
         - Copie le jeton Bearer dans l'en-tête **"Authorization"**
@@ -260,7 +261,9 @@ Ne communiques ton token à personne !
 ### COLLECTION PAGE ###
     if selected == "Collection" : 
 
-        df = create_dataframe(CSV_ALL_OUTPUT_PATH)
+        df = create_dataframe()
+        if df.empty:
+            return  # Stop execution if DataFrame is empty
         df, column_order, column_configuration = transform_dataframe(df)
         df_all = df.copy()
         filter_col, df_col = st.columns([1, 4])
@@ -292,7 +295,7 @@ Ne communiques ton token à personne !
 
             df = df.copy()
 
-            modification_container = st.container(border=True)
+            modification_container = st.container()
 
             with modification_container:
                 to_filter_columns = st.multiselect("Filtrer le tableau", columns_to_select)
@@ -377,17 +380,9 @@ Ne communiques ton token à personne !
             column_order=column_order,
             use_container_width=True,
             hide_index=True,
-            # on_select="rerun",
-            # selection_mode="multi-row",
             )
 
-        # cards = event.selection.rows
-        # second_df = df[['Image','Nom','Faction','Rareté','Type','Numéro','En excès', 'Manquantes']].iloc[cards]
-
-        # st.header(f"Cartes sélectionnées : {len(cards)}")
-        # st.dataframe(second_df, column_config=column_configuration, use_container_width=True)
-    
-#### STATISTIQUES #####
+        #### STATISTIQUES #####
         st.subheader("Statistiques", divider = 'gray')
         stats, graph = st.columns([1, 2], vertical_alignment="center")
         
@@ -421,7 +416,7 @@ Ne communiques ton token à personne !
                             yaxis_title=None,
                             height=350,
                             legend=dict(
-                            y=0.5, x=-0.2  # Ajustez la valeur pour positionner la légende plus haut ou plus bas
+                            y=0.5, x=-0.2  # Adjust the value to position the legend higher or lower
                         ))
 
 
@@ -432,7 +427,9 @@ Ne communiques ton token à personne !
 ### TRADABLE PAGE ###     
     if selected == "Tradable" : 
         
-        df = create_dataframe(CSV_ALL_OUTPUT_PATH)
+        df = create_dataframe()
+        if df.empty:
+            return  # Stop execution if DataFrame is empty
         df, column_order, column_configuration = transform_dataframe(df)
         
         df_collection = df[df['En possession'] > 0].copy()
@@ -452,7 +449,7 @@ Ne communiques ton token à personne !
         left.subheader("Mes cartes :", divider = 'gray')
 
         right.subheader("Les cartes du poto :", divider = 'gray')
-        csv_poto = right.file_uploader("dépose le .csv de ton poto ici", label_visibility="collapsed")
+        csv_poto = right.file_uploader("Dépose le .csv de ton poto ici", label_visibility="collapsed")
 
         if "name_user" not in st.session_state:
             st.session_state["name_user"] = ""
@@ -492,10 +489,6 @@ Ne communiques ton token à personne !
             use_container_width=True,
             hide_index=True)
 
-            
-
-            
-
         if csv_poto is not None:
             file_name = csv_poto.name
             name_poto = file_name[10:-4]
@@ -531,7 +524,7 @@ Ne communiques ton token à personne !
                 left3.dataframe(df_give,
                 column_config={'Image': st.column_config.ImageColumn(
                                 "Image", 
-                                help="Aperçut de la carte. Double cliquer pour agrandir.",
+                                help="Aperçu de la carte. Double-cliquer pour agrandir.",
                                 width = "small"
                                 )},
                 use_container_width=True,
@@ -543,7 +536,7 @@ Ne communiques ton token à personne !
                 right3.dataframe(df_get,
                 column_config={'Image': st.column_config.ImageColumn(
                                 "Image", 
-                                help="Aperçut de la carte. Double cliquer pour agrandir.",
+                                help="Aperçu de la carte. Double-cliquer pour agrandir.",
                                 width = "small"
                                 )},
                 use_container_width=True,
