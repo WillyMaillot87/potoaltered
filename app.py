@@ -13,7 +13,7 @@ from utils import dump_json, create_folder_if_not_exists
 from os.path import join
 
 # Version : 
-version = "v1.5"
+version = "v1.6"
 
 # Parameters
 LANGUAGES = ["fr"]
