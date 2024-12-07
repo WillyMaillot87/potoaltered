@@ -1,5 +1,5 @@
 import streamlit as st
-from app import create_dataframe, transform_dataframe
+from utils import create_dataframe, transform_dataframe
 
 # Parameters
 CSV_ALL_OUTPUT_PATH = "data/global_vision.csv"
