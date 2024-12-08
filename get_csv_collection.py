@@ -1,4 +1,10 @@
-# Parameters
+import io
+import csv
+import itertools
+import streamlit as st
+from utils import load_json
+
+# Paramètres
 NAME_LANGUAGES = ["fr"]
 ABILITIES_LANGUAGES = ["fr"]
 MAIN_LANGUAGE = "fr"
@@ -10,29 +16,9 @@ FACTIONS_DATA_PATH = "data/factions.json"
 TYPES_DATA_PATH = "data/types.json"
 SUBTYPES_DATA_PATH = "data/subtypes.json"
 RARITIES_DATA_PATH = "data/rarities.json"
-CSV_COLLEC_OUTPUT_PATH = "data/collection_" + MAIN_LANGUAGE + ".csv"
-
-# Imports
-import os
-import csv
-import itertools
-from utils import load_json
 
 def get_csv_collec():
-    if not os.path.exists(COLLECTION_DATA_PATH):
-        print(f"File {COLLECTION_DATA_PATH} not found. Have you run get_cards_data.py?")
-        return
-    if not os.path.exists(FACTIONS_DATA_PATH):
-        print(f"File {FACTIONS_DATA_PATH} not found. Have you run get_cards_data.py?")
-        return
-    if not os.path.exists(TYPES_DATA_PATH):
-        print(f"File {TYPES_DATA_PATH} not found. Have you run get_cards_data.py?")
-        return
-    if not os.path.exists(SUBTYPES_DATA_PATH):
-        print(f"File {SUBTYPES_DATA_PATH} not found. Have you run get_cards_data.py?")
-        return
-    if not os.path.exists(RARITIES_DATA_PATH):
-        print(f"File {RARITIES_DATA_PATH} not found. Have you run get_cards_data.py?")
+    if not check_files_exist():
         return
     
     data = load_json(COLLECTION_DATA_PATH)
@@ -64,7 +50,6 @@ def get_csv_collec():
             for subtype in card["subtypes"]:
                 card_dict["subtype_" + str(subtypes_cols[subtype]+1)] = subtypes[subtype][MAIN_LANGUAGE]
 
-        # Include the collection stats if present in the cards data
         if "foiled" in card:
             card_dict["foiled"] = card["foiled"]
             if "foiled" not in fieldnames:
@@ -105,23 +90,23 @@ def get_csv_collec():
                     card_dict["supportAbility" + "_" + language] = card["elements"]["ECHO_EFFECT"][language]
         for language in NAME_LANGUAGES:
             card_dict["name" + "_" + language] = card["name"][language]
-        if INCLUDE_WEB_ASSETS:
-            card_dict["webAsset0"] = None
-            card_dict["webAsset1"] = None
-            card_dict["webAsset2"] = None
-            if "WEB" in card["assets"]:
-                if len(card["assets"]["WEB"]) > 0:
-                    card_dict["webAsset0"] = card["assets"]["WEB"][0]
-                if len(card["assets"]["WEB"]) > 1:
-                    card_dict["webAsset1"] = card["assets"]["WEB"][1]
-                if len(card["assets"]["WEB"]) > 2:
-                    card_dict["webAsset2"] = card["assets"]["WEB"][2]
+        if INCLUDE_WEB_ASSETS and "WEB" in card["assets"]:
+            web_assets = card["assets"]["WEB"]
+            for i in range(min(3, len(web_assets))):
+                card_dict["webAsset" + str(i)] = web_assets[i]
+
         cards_dicts.append(card_dict)
     
     for language in NAME_LANGUAGES:
-        fieldnames.append("name_" + language)
-    fieldnames += ["faction", "rarity", "type"]
-    if GROUP_SUBTYPES:
+        if "name_" + language not in fieldnames:
+            fieldnames.append("name_" + language)
+    if "faction" not in fieldnames:
+        fieldnames.append("faction")
+    if "rarity" not in fieldnames:
+        fieldnames.append("rarity")
+    if "type" not in fieldnames:
+        fieldnames.append("type")
+    if GROUP_SUBTYPES and "subtypes" not in fieldnames:
         fieldnames.append("subtypes")
     else:
         try:
@@ -129,18 +114,31 @@ def get_csv_collec():
                 fieldnames.append("subtype_" + str(i+1))
         except:
             pass
-    fieldnames += ["handCost", "reserveCost", "forestPower", "mountainPower", "waterPower", "landmarksSize", "reserveSize"]
+    for col in ["handCost", "reserveCost", "forestPower", "mountainPower", "waterPower", "landmarksSize", "reserveSize"]:
+        if col not in fieldnames:
+            fieldnames.append(col)
     for language in ABILITIES_LANGUAGES:
-        fieldnames += ["abilities_" + language, "supportAbility_" + language]
-    fieldnames += ["id", "imagePath"]
+        if "abilities_" + language not in fieldnames:
+            fieldnames.append("abilities_" + language)
+        if "supportAbility_" + language not in fieldnames:
+            fieldnames.append("supportAbility_" + language)
+    if "id" not in fieldnames:
+        fieldnames.append("id")
+    if "imagePath" not in fieldnames:
+        fieldnames.append("imagePath")
     if INCLUDE_WEB_ASSETS:
-        fieldnames += ["webAsset0", "webAsset1", "webAsset2"]
+        for i in range(3):
+            if "webAsset" + str(i) not in fieldnames:
+                fieldnames.append("webAsset" + str(i))
     
-    with open(CSV_COLLEC_OUTPUT_PATH, 'w', newline='', encoding="utf8") as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
-        for card_dict in sorted(cards_dicts, key=custom_sort):
-            writer.writerow(card_dict)
+    csv_buffer = io.StringIO()
+    writer = csv.DictWriter(csv_buffer, fieldnames=fieldnames)
+    writer.writeheader()
+    for card_dict in sorted(cards_dicts, key=custom_sort):
+        writer.writerow(card_dict)
+    
+    csv_buffer.seek(0)
+    st.session_state["csv_data"] = csv_buffer.getvalue()
 
 def custom_sort(card):
     beforeRarity = card["collectorNumber"][:-4]
@@ -167,6 +165,13 @@ def get_subtypes_cols(data):
             col += 1
         subtypes_cols[subtype] = col
     return subtypes_cols
+
+def check_files_exist():
+    for path in [COLLECTION_DATA_PATH, FACTIONS_DATA_PATH, TYPES_DATA_PATH, SUBTYPES_DATA_PATH, RARITIES_DATA_PATH]:
+        if not os.path.exists(path):
+            print(f"File {path} not found. Have you run get_cards_data.py?")
+            return False
+    return True
 
 if __name__ == "__main__":
     get_csv_collec()
