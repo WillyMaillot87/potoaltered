@@ -10,7 +10,7 @@ from get_csv_data import get_csv
 from get_all_data import get_dataframes
 
 # Version : 
-version = "v2"
+version = "v1.8"
 
 # Parameters
 LANGUAGES = ["fr"]
