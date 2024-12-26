@@ -7,13 +7,10 @@ import plotly.express as px
 from streamlit_option_menu import option_menu
 from get_cards_data import get_cards_data
 from get_csv_data import get_csv
-from get_csv_collection import get_csv_collec
 from get_all_data import get_dataframes
-from utils import dump_json, create_folder_if_not_exists
-from os.path import join
 
 # Version : 
-version = "v1.6"
+version = "v2"
 
 # Parameters
 LANGUAGES = ["fr"]
@@ -34,18 +31,6 @@ MAIN_LANGUAGE = "fr"
 GROUP_SUBTYPES = False
 INCLUDE_WEB_ASSETS = False
 
-# Remove paths since we won't use them
-# CARDS_DATA_PATH = "data/cards.json"
-# COLLECTION_DATA_PATH = "data/collection.json"
-# FACTIONS_DATA_PATH = "data/factions.json"
-# TYPES_DATA_PATH = "data/types.json"
-# SUBTYPES_DATA_PATH = "data/subtypes.json"
-# RARITIES_DATA_PATH = "data/rarities.json"
-# CSV_OUTPUT_PATH = "data/cards_" + MAIN_LANGUAGE + ".csv"
-# CSV_COLLEC_OUTPUT_PATH = "data/collection_" + MAIN_LANGUAGE + ".csv"
-# ALL_CARDS_PATH = "data/cards_fr.csv"
-# MY_COLLECTION_PATH = "data/collection_fr.csv"
-# CSV_ALL_OUTPUT_PATH = "data/global_vision.csv"
 
 st.set_page_config(
     page_title= "PotoAltered",
@@ -83,20 +68,20 @@ def run_script():
         st.session_state['factions'] = factions
         st.session_state['rarities'] = rarities
 
-        # get_collection_data :
-        collection, _, _, _, _ = get_cards_data(collection_token=saved_token)
-        st.session_state['collection'] = collection
-
         # get_csv_data :
-        cards_csv = get_csv(cards, types, subtypes, factions, rarities)
-        st.session_state['cards_csv'] = cards_csv
+        cards_csv_buffer = get_csv(cards)
+        st.session_state['cards_csv'] = cards_csv_buffer.getvalue()
+
+        # get_collection_data :
+        collection_dict, _, _, _, _ = get_cards_data(collection_token=saved_token)
+        st.session_state['collection'] = collection_dict
 
         # get_csv_collection :
-        collection_csv = get_csv_collec(collection)
-        st.session_state['collection_csv'] = collection_csv
+        collection_csv_buffer = get_csv(st.session_state['collection'])
+        st.session_state['collection_csv'] = collection_csv_buffer.getvalue()
 
         # get_all_data
-        global_df = get_dataframes(st.session_state['cards_csv'], st.session_state['collection_csv'])
+        global_df = get_dataframes("cards_csv", "collection_csv")
         st.session_state['global_df'] = global_df
 
         st.success("Le chargement de la collection est terminé.")

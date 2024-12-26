@@ -31,6 +31,9 @@ from pandas.api.types import (
     is_numeric_dtype,
     is_object_dtype,
 )
+import csv
+import io
+
 
 def create_folder_if_not_exists(folder):
     if not os.path.exists(folder):
@@ -78,3 +81,18 @@ def create_or_read_file(filename):
   
   with open(filename, "r") as f:
     return f.read()
+
+def generate_csv_buffer(data, fieldnames, sort_key=None): 
+
+    """ Génère un tampon CSV à partir des données fournies. Args: data (list of dict): Les données à écrire dans le CSV. fieldnames (list):
+    Les noms des colonnes. sort_key (function, optional):
+    Fonction de tri pour les données. Returns: io.StringIO: Un tampon CSV contenant les données triées. """
+
+    csv_buffer = io.StringIO()
+    writer = csv.DictWriter(csv_buffer, fieldnames=fieldnames)
+    writer.writeheader()
+    if sort_key:
+        data = sorted(data, key=sort_key)
+        for row in data:
+            writer.writerow(row) 
+            csv_buffer.seek(0) # Réinitialiser le curseur pour la lecture return csv_buffer

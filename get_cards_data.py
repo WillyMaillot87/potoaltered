@@ -271,7 +271,9 @@ def get_cards_data(
     subtypes = merge_language_dicts(treated_subtypes)
     factions = merge_language_dicts(treated_factions)
     rarities = merge_language_dicts(treated_rarities)
+    
     return cards, types, subtypes, factions, rarities
+
 
 if __name__ == "__main__":
     cards, types, subtypes, factions, rarities = get_cards_data()
