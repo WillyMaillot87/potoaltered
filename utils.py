@@ -79,12 +79,13 @@ def create_or_read_file(filename):
   with open(filename, "r") as f:
     return f.read()
 
-def create_dataframe(csv_path):
-    if os.path.isfile(csv_path) :
-        df = pd.read_csv(csv_path)
-    else :
+def create_dataframe():
+    if 'global_df' in st.session_state:
+        df = st.session_state['global_df']
+        return df
+    else:
         st.error("La collection n'est pas créée. Merci d'ajouter votre token via la page 'Home'.")
-    return df
+        return pd.DataFrame()  # Return an empty DataFrame if not available
 
 def transform_dataframe(df) :   
     columns_power = ['forestPower', 'mountainPower', 'waterPower']

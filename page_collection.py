@@ -2,9 +2,9 @@ import streamlit as st
 from utils import create_dataframe, transform_dataframe
 
 # Parameters
-CSV_ALL_OUTPUT_PATH = "data/global_vision.csv"
 
-df = create_dataframe(CSV_ALL_OUTPUT_PATH)
+df = create_dataframe()
+
 df, column_order, column_configuration = transform_dataframe(df)
 df_all = df.copy()
 filter_col, df_col = st.columns([1, 4])

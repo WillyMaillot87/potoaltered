@@ -2,10 +2,7 @@ import streamlit as st
 import pandas as pd
 from utils import create_dataframe, transform_dataframe, show_trades
 
-# Parameters
-CSV_ALL_OUTPUT_PATH = "data/global_vision.csv"
-
-df = create_dataframe(CSV_ALL_OUTPUT_PATH)
+df = create_dataframe()
 df, column_order, column_configuration = transform_dataframe(df)
 
 df_collection = df[df['En possession'] > 0].copy()

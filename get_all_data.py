@@ -1,14 +1,13 @@
 # Script by Willy MAILLOT
 # MIT License
 
-import os
+import io
 import pandas as pd
 import numpy as np
+import streamlit as st
 
 #PARAMETERS
 ALL_CARDS_PATH = "data/cards_fr.csv"
-MY_COLLECTION_PATH = "data/collection_fr.csv"
-CSV_ALL_OUTPUT_PATH = "data/global_vision.csv"
 
 def check_KS(id):
     '''Identify the Kickstarter edition'''
@@ -24,19 +23,19 @@ def concat_strings(col):
     elements_uniques = set(col)
     return ' / '.join(elements_uniques)
 
-def get_dataframes(all_cards_path, my_collection_path):
+def get_dataframes(cards_csv, collection_csv):
 
-    if not os.path.exists(ALL_CARDS_PATH):
-        print(f"File {ALL_CARDS_PATH} not found. Have you run get_cards_data.py and get_csv_data.py ?")
-        return
-    if not os.path.exists(MY_COLLECTION_PATH):
-        print(f"File {MY_COLLECTION_PATH} not found. Have you run get_collection_data.py and get_collection_data.py ?")
-        return
-    
-    all_cards = pd.read_csv(all_cards_path)
+    all_cards_path = st.session_state.get(cards_csv, "")
+    my_collection_path = st.session_state.get(collection_csv, "")
+
+    all_cards_buffer = io.StringIO(all_cards_path)
+    collection_buffer = io.StringIO(my_collection_path)
+
+
+    all_cards = pd.read_csv(all_cards_buffer)
     print("shape of dataframe 'all cards' : ", all_cards.shape)
 
-    my_collection = pd.read_csv(my_collection_path)
+    my_collection = pd.read_csv(collection_buffer)
     print("shape of dataframe 'my collection' : ", my_collection.shape)
 
     ## Pre-processing **all_cards** dataframe
@@ -169,8 +168,4 @@ def get_dataframes(all_cards_path, my_collection_path):
 
     # df = df.rename(columns = new_names_fr)
 
-    df.to_csv(CSV_ALL_OUTPUT_PATH, index=False)
-    print(f"The dataframe 'global_vision'  {df.shape} is ready ({CSV_ALL_OUTPUT_PATH})")
-
-if __name__ == "__main__":
-    get_dataframes(ALL_CARDS_PATH, MY_COLLECTION_PATH)
+    return df

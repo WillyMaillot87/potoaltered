@@ -3,9 +3,7 @@ from os.path import join
 import subprocess
 from get_cards_data import get_cards_data
 from get_csv_data import get_csv
-from get_csv_collection import get_csv_collec
 from get_all_data import get_dataframes
-from utils import dump_json, create_folder_if_not_exists
 
 # Parameters
 LANGUAGES = ["fr"]
@@ -38,43 +36,51 @@ ALL_CARDS_PATH = "data/cards_fr.csv"
 MY_COLLECTION_PATH = "data/collection_fr.csv"
 CSV_ALL_OUTPUT_PATH = "data/global_vision.csv"
 
-def run_script(saved_token):
-    try :
-        #get_cards_data :
+def run_script():
+    saved_token = st.session_state.get("input_token")
+    if not saved_token:
+        st.error("Le token n'est pas défini. Merci de le saisir sur la page 'Home'.")
+        return
+
+    try:
+        # get_cards_data :
         cards, types, subtypes, factions, rarities = get_cards_data()
-        create_folder_if_not_exists(OUTPUT_FOLDER)
-        dump_json(cards,    join(OUTPUT_FOLDER, 'cards.json'))
-        dump_json(types,    join(OUTPUT_FOLDER, 'types.json'))
-        dump_json(subtypes, join(OUTPUT_FOLDER, 'subtypes.json'))
-        dump_json(factions, join(OUTPUT_FOLDER, 'factions.json'))
-        dump_json(rarities, join(OUTPUT_FOLDER, 'rarities.json'))
+        # Store data in session_state instead of files
+        st.session_state['cards'] = cards
+        st.session_state['types'] = types
+        st.session_state['subtypes'] = subtypes
+        st.session_state['factions'] = factions
+        st.session_state['rarities'] = rarities
 
-        #get_collection_data :
-        collection, types, subtypes, factions, rarities = get_cards_data(collection_token=saved_token)
-        create_folder_if_not_exists(OUTPUT_FOLDER)
-        dump_json(collection,    join(OUTPUT_FOLDER, 'collection.json'))
+        # get_csv_data :
+        cards_csv_buffer = get_csv(cards)
+        st.session_state['cards_csv'] = cards_csv_buffer.getvalue()
 
-        #get_csv_data :
-        get_csv()
+        # get_collection_data :
+        collection_dict, _, _, _, _ = get_cards_data(collection_token=saved_token)
+        st.session_state['collection'] = collection_dict
 
-        #get_csv_collection :
-        get_csv_collec()
+        # get_csv_collection :
+        collection_csv_buffer = get_csv(st.session_state['collection'])
+        st.session_state['collection_csv'] = collection_csv_buffer.getvalue()
 
-        #get_all_data
-        get_dataframes(ALL_CARDS_PATH, MY_COLLECTION_PATH)
+        # get_all_data
+        global_df = get_dataframes("cards_csv", "collection_csv")
+        st.session_state['global_df'] = global_df
 
         st.success("Le chargement de la collection est terminé.")
     except subprocess.CalledProcessError as e:
         st.error(f"Erreur lors de l'execution du script : {e}")
 
+st.title("PotoAltered") 
+st.text(st.session_state.version)
+
 col1, col2 = st.columns([2,1])
 
 with col1 : 
-    st.title("Bienvenue !") 
-    st.text(st.session_state.version)
-    st.markdown("""Dans le but de pouvoir récupérer les données de ta collection personnelle, je t'invite à coller ton token JWT dans le champ ci-dessous. 
-Ce token est directement envoyé à l'API d'Altered pour t'identifier et accéder à ta collection.
-Le token n'est pas envoyé en ligne, il reste stocké uniquement sur ton application à toi.
+
+    st.markdown("""Dans le but de pouvoir récupérer les données de ta collection personnelle, je t'invite à coller ton token JWT dans le champ ci-dessous.
+Ce token est utilisé dans la requête envoyée à l'API d'Altered pour t'identifier et accéder à ta collection. Le token n'est pas conservé ni stocké sur l'application en ligne.
 Cette étape n'est à faire qu'une seule fois pour télécharger les données de ta collection.
             
 Ne communiques ton token à personne !
@@ -93,10 +99,10 @@ Ne communiques ton token à personne !
 
     if submit:
         st.session_state["input_token"] = input_token
-        run_script(st.session_state["input_token"])
+        run_script()
 
     with col2 :
-        st.image("images/PotoAltered_logo.png", width=500)
+        st.image("images/potoaltered_anime.jpeg", use_column_width =True)
     with col1 :
         with st.expander(":bulb: Comment récupérer son token ?"):
             st.markdown('''
