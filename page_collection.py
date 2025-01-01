@@ -15,8 +15,9 @@ with filter_col :
                     'Type']
     
     columns_string = ['Nom',
-                        'Numéro',
-                        'id']
+                      'Numéro',
+                      'Capacité',
+                      'id']
     
     columns_int = ['En possession',
                     'Dont KS',
@@ -116,7 +117,7 @@ with filter_col :
         use_container_width=True
         )
     
-    #### STATISTIQUES #####
+    # Statistiques
     shape_all = df_all.shape[0]
     shape_filtered = df.shape[0]
     st.markdown(f"**{shape_filtered}** cartes sélectionnées sur **{shape_all}** disponibles")

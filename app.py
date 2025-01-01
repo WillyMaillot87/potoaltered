@@ -3,7 +3,7 @@ import streamlit as st
 def run():
 
     # Version : 
-    version = "v2"
+    version = "(v2)"
     if version not in st.session_state:
         st.session_state['version'] = version
 
